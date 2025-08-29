@@ -17,12 +17,13 @@ from .serializers import (
 from rest_framework import generics, permissions
 from admin_panel.models import Food, Course
 from .serializers import FoodSerializer, CourseSerializer
+from rest_framework.parsers import MultiPartParser, FormParser
 
-# رجیستر دانشجو با JWT
 class StudentRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
     permission_classes = [permissions.AllowAny]
+    parser_classes = [MultiPartParser, FormParser]  # ⬅️ اضافه شد
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
