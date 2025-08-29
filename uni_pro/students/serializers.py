@@ -30,7 +30,7 @@ class CourseReservationDetailSerializer(serializers.ModelSerializer):
 # ثبت نام
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
-    profile_image = serializers.ImageField(required=False, allow_null=True)
+    profile_image = serializers.ImageField(required=False, allow_null=True, use_url=True)
 
     class Meta:
         model = User
