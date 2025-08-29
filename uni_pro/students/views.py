@@ -18,20 +18,26 @@ from rest_framework import generics, permissions
 from admin_panel.models import Food, Course
 from .serializers import FoodSerializer, CourseSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
-
 class StudentRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserRegisterSerializer
     permission_classes = [permissions.AllowAny]
-    parser_classes = [MultiPartParser, FormParser]  # ⬅️ اضافه شد
+    parser_classes = [MultiPartParser, FormParser]
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
         user = User.objects.get(username=response.data['username'])
         refresh = RefreshToken.for_user(user)
-        response.data['access'] = str(refresh.access_token)
-        response.data['refresh'] = str(refresh)
-        return response
+
+        # 👇 دوباره serialize برای گرفتن URL عکس
+        serializer = UserRegisterSerializer(user, context={'request': request})
+
+        data = serializer.data
+        data['access'] = str(refresh.access_token)
+        data['refresh'] = str(refresh)
+
+        return Response(data, status=status.HTTP_201_CREATED)
+
 
 # لاگین دانشجو با JWT
 class StudentLoginView(APIView):
