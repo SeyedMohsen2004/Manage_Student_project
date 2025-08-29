@@ -3,7 +3,6 @@ from .models import User, FoodReservation, CourseReservation
 from admin_panel.models import Food, Course
 from django.contrib.auth.password_validation import validate_password
 
-# برای نمایش خلاصه‌ی غذا و دوره در رزروها
 class FoodNestedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Food
@@ -14,7 +13,6 @@ class CourseNestedSerializer(serializers.ModelSerializer):
         model = Course
         fields = ('id','name','professor','grade','credits','cost')
 
-# رزروها با اطلاعات مربوطه
 class FoodReservationDetailSerializer(serializers.ModelSerializer):
     food = FoodNestedSerializer(read_only=True)
     class Meta:
@@ -27,7 +25,6 @@ class CourseReservationDetailSerializer(serializers.ModelSerializer):
         model = CourseReservation
         fields = ('id','course','price_paid','created_at')
 
-# ثبت نام
 class UserRegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     profile_image = serializers.ImageField(required=False, allow_null=True, use_url=True)
@@ -44,18 +41,15 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user.save()
         return user
 
-# Serializer برای واریز پول
 class DepositSerializer(serializers.Serializer):
     amount = serializers.DecimalField(max_digits=12, decimal_places=2)
 
-# نمایش اطلاعات کاربر (برای me و داشبورد)
 class UserSerializer(serializers.ModelSerializer):
     profile_image = serializers.ImageField(read_only=True)
     class Meta:
         model = User
         fields = ('id','username','email','amount','last_login','role','profile_image')
 
-# آپدیت پروفایل کاربر (username, email, profile_image)
 class UserUpdateSerializer(serializers.ModelSerializer):
     profile_image = serializers.ImageField(required=False, allow_null=True)
 
@@ -75,7 +69,6 @@ class UserUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("این ایمیل قبلاً ثبت شده است.")
         return value
 
-# تغییر رمز (نیاز به رمز قدیم و رمز جدید)
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
     new_password = serializers.CharField(required=True, validators=[validate_password])
@@ -86,7 +79,6 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError("رمز قدیم اشتباه است.")
         return value
 
-# student/serializers.py (اضافه شود)
 class FoodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Food

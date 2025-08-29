@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db.models import F
 from decimal import Decimal
-
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, FoodReservation, CourseReservation
 from admin_panel.models import Food, Course
@@ -29,7 +28,6 @@ class StudentRegisterView(generics.CreateAPIView):
         user = User.objects.get(username=response.data['username'])
         refresh = RefreshToken.for_user(user)
 
-        # 👇 دوباره serialize برای گرفتن URL عکس
         serializer = UserRegisterSerializer(user, context={'request': request})
 
         data = serializer.data
@@ -39,7 +37,6 @@ class StudentRegisterView(generics.CreateAPIView):
         return Response(data, status=status.HTTP_201_CREATED)
 
 
-# لاگین دانشجو با JWT
 class StudentLoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -56,7 +53,8 @@ class StudentLoginView(APIView):
             "access": str(refresh.access_token),
             "refresh": str(refresh)
         })
-# مشاهده اطلاعات خود دانشجو
+        
+        
 class MeView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -64,7 +62,6 @@ class MeView(APIView):
         serializer = UserSerializer(request.user, context={'request': request})
         return Response(serializer.data)
 
-# آپدیت پروفایل
 class ProfileUpdateView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserUpdateSerializer
@@ -72,7 +69,6 @@ class ProfileUpdateView(generics.UpdateAPIView):
     def get_object(self):
         return self.request.user
 
-# تغییر رمز
 class ChangePasswordView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -84,7 +80,6 @@ class ChangePasswordView(APIView):
         user.save()
         return Response({'detail':'Password changed successfully'}, status=status.HTTP_200_OK)
 
-# واریز پول
 class DepositView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -98,7 +93,6 @@ class DepositView(APIView):
         user.refresh_from_db()
         return Response({'detail':'Deposit successful', 'new_amount': str(user.amount)}, status=status.HTTP_200_OK)
 
-# رزرو غذا
 class ReserveFoodView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -119,7 +113,6 @@ class ReserveFoodView(APIView):
         res = FoodReservation.objects.create(student=user, food=food, price_paid=food.price)
         return Response({'detail':'Reserved', 'reservation_id': res.id, 'new_amount': str(user.amount)}, status=201)
 
-# لغو رزرو غذا
 class CancelFoodReservationView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -137,7 +130,6 @@ class CancelFoodReservationView(APIView):
         food.refresh_from_db()
         return Response({'detail':'Cancelled and refunded', 'new_amount': str(user.amount)}, status=200)
 
-# رزرو دوره
 class ReserveCourseView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -158,7 +150,6 @@ class ReserveCourseView(APIView):
         res = CourseReservation.objects.create(student=user, course=course, price_paid=course.cost)
         return Response({'detail':'Course reserved', 'reservation_id': res.id, 'new_amount': str(user.amount)}, status=201)
 
-# لغو رزرو دوره
 class CancelCourseReservationView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -176,7 +167,6 @@ class CancelCourseReservationView(APIView):
         course.refresh_from_db()
         return Response({'detail':'Course reservation cancelled and refunded', 'new_amount': str(user.amount)}, status=200)
 
-# داشبورد دانشجو
 class StudentDashboardView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -193,13 +183,11 @@ class StudentDashboardView(APIView):
             'course_reservations': course_serializer.data
         })
 
-# تمام غذاها
 class AllFoodsView(generics.ListAPIView):
     queryset = Food.objects.all()
     serializer_class = FoodSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-# تمام دوره‌ها
 class AllCoursesView(generics.ListAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer

@@ -11,15 +11,13 @@ from .serializers import (
     StudentForAdminSerializer,
     FoodReservationAdminSerializer,
     CourseReservationAdminSerializer,
-    AdminRegisterSerializer  # مشابه UserRegisterSerializer با role=admin
+    AdminRegisterSerializer  
 )
 
-# بررسی نقش ادمین
 class IsAdminUserRole(permissions.BasePermission):
     def has_permission(self, request, view):
         return bool(request.user and request.user.is_authenticated and getattr(request.user, 'role', None) == 'admin')
 
-# رجیستر ادمین با JWT
 class AdminRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = AdminRegisterSerializer
@@ -33,7 +31,6 @@ class AdminRegisterView(generics.CreateAPIView):
         response.data['refresh'] = str(refresh)
         return response
 
-# لاگین ادمین با JWT
 class AdminLoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
@@ -51,7 +48,6 @@ class AdminLoginView(APIView):
             "refresh": str(refresh)
         })
 
-# مدیریت غذا
 class FoodCreateListView(generics.ListCreateAPIView):
     queryset = Food.objects.all()
     serializer_class = FoodSerializer
@@ -62,7 +58,6 @@ class FoodDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FoodSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdminUserRole]
 
-# مدیریت دوره
 class CourseCreateListView(generics.ListCreateAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
@@ -73,7 +68,6 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CourseSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdminUserRole]
 
-# لیست دانشجویان برای ادمین
 class StudentListForAdminView(generics.ListAPIView):
     queryset = User.objects.filter(role='student').order_by('username')
     serializer_class = StudentForAdminSerializer
@@ -84,7 +78,6 @@ class StudentDetailForAdminView(generics.RetrieveAPIView):
     serializer_class = StudentForAdminSerializer
     permission_classes = [permissions.IsAuthenticated, IsAdminUserRole]
 
-# تمام رزروها
 class AllReservationsView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsAdminUserRole]
 
@@ -95,7 +88,6 @@ class AllReservationsView(APIView):
         course_ser = CourseReservationAdminSerializer(course_res, many=True)
         return Response({'food_reservations': food_ser.data, 'course_reservations': course_ser.data})
 
-# داشبورد ادمین
 class AdminDashboardView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsAdminUserRole]
 

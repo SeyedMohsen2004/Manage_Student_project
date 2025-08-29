@@ -12,7 +12,7 @@ class AdminRegisterSerializer(serializers.ModelSerializer):
         extra_kwargs = {'role': {'read_only': True}}
 
     def create(self, validated_data):
-        validated_data['role'] = 'admin'  # نقش ادمین ثابت
+        validated_data['role'] = 'admin'  
         password = validated_data.pop('password')
         user = User(**validated_data)
         user.set_password(password)
@@ -29,7 +29,6 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         fields = '__all__'
 
-# خلاصه رزروهای غذا (برای نمایش در داشبورد ادمین)
 class FoodReservationAdminSerializer(serializers.ModelSerializer):
     student = serializers.StringRelatedField()
     food = serializers.StringRelatedField()
@@ -46,7 +45,6 @@ class CourseReservationAdminSerializer(serializers.ModelSerializer):
         model = CourseReservation
         fields = ('id','student','course','price_paid','created_at')
 
-# نمایش دانشجو برای ادمین با رزروهایش
 class StudentForAdminSerializer(serializers.ModelSerializer):
     food_reservations = FoodReservationAdminSerializer(many=True, read_only=True)
     course_reservations = CourseReservationAdminSerializer(many=True, read_only=True)
